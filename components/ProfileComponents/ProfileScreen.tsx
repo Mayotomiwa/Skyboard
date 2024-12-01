@@ -1,13 +1,18 @@
+import { router } from "expo-router";
 import { ChevronRight, Edit } from "lucide-react-native";
-import React from "react";
+import React, { useState } from "react";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import {
-    Image,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  Image,
+  Modal,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 interface MenuItem {
@@ -16,16 +21,60 @@ interface MenuItem {
   icon: string;
   isLogout?: boolean;
   hasArrow?: boolean;
+  route: string;
 }
+const { height } = Dimensions.get("window");
 
 const ProfileSettings: React.FC = () => {
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
   const menuItems: MenuItem[] = [
-    { id: "1", title: "Notification", icon: "🔔", hasArrow: true },
-    { id: "2", title: "Security", icon: "🔒", hasArrow: true },
-    { id: "3", title: "Help", icon: "ℹ️", hasArrow: true },
-    { id: "4", title: "Invite Friends", icon: "👥", hasArrow: true },
-    { id: "5", title: "Bank Account", icon: "🏦", hasArrow: true },
-    { id: "6", title: "Logout", icon: "🚪", isLogout: true },
+    {
+      id: "1",
+      title: "Notification",
+      icon: "🔔",
+      hasArrow: true,
+      route: "/notification",
+    },
+    {
+      id: "2",
+      title: "Security",
+      icon: "🔒",
+      hasArrow: true,
+      route: "/security",
+    },
+    {
+      id: "3",
+      title: "Help",
+      icon: "ℹ️",
+      hasArrow: true,
+      route: "/help",
+    },
+    {
+      id: "4",
+      title: "Invite Friends",
+      icon: "👥",
+      hasArrow: true,
+      route: "/inviteFriends",
+    },
+    {
+      id: "5",
+      title: "Bank Account",
+      icon: "🏦",
+      hasArrow: true,
+      route: "/bank",
+    },
+    {
+      id: "6",
+      title: "Logout",
+      icon: "🚪",
+      isLogout: true,
+      route: "",
+    },
   ];
 
   return (
@@ -40,7 +89,9 @@ const ProfileSettings: React.FC = () => {
               resizeMode="cover"
             />
             <TouchableOpacity style={styles.editAvatarButton}>
-              <Text style={styles.editAvatarIcon}><Edit color={'#D1B1D1'}/></Text>
+              <Text style={styles.editAvatarIcon}>
+                <Edit color={"#D1B1D1"} />
+              </Text>
             </TouchableOpacity>
           </View>
           <View>
@@ -54,6 +105,9 @@ const ProfileSettings: React.FC = () => {
         <View style={styles.menuSection}>
           {menuItems.map((item) => (
             <TouchableOpacity
+              onPress={() =>
+                item.isLogout ? toggleModal() : router.push(item.route)
+              }
               key={item.id}
               style={[styles.menuItem, item.isLogout && styles.logoutItem]}
             >
@@ -79,6 +133,38 @@ const ProfileSettings: React.FC = () => {
           ))}
         </View>
       </ScrollView>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={toggleModal}
+      >
+        <Pressable style={styles.overlay} onPress={toggleModal} />
+        <View style={styles.modalContainer}>
+          <MaterialIcons
+            name="exit-to-app"
+            size={54}
+            color="#E75B99"
+            style={styles.modalTitle}
+          />
+
+          <Text style={styles.modalText}>Are you sure you want to logout?</Text>
+          <View
+            style={[
+              styles.buttonContainer,
+              { flexDirection: "row", justifyContent: "space-between" },
+            ]}
+          >
+            <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
+              <Text style={styles.closeButtonText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.logButton} onPress={toggleModal}>
+              <Text style={styles.logButtonText}>Logout</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -120,7 +206,7 @@ const styles = StyleSheet.create({
   },
   profileSection: {
     flexDirection: "row",
-    justifyContent: 'center',
+    justifyContent: "center",
     alignItems: "center",
     paddingVertical: 24,
     gap: 20,
@@ -204,6 +290,78 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     color: "#FF3B30",
+  },
+
+  // Modal
+
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContainer: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    height: height * 0.3,
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontWeight: "bold",
+    marginTop: 10,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  modalText: {
+    fontSize: 18,
+    fontWeight: 800,
+    color: "#333",
+    marginBottom: 40,
+    textAlign: "center",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  logButton: {
+    flex: 1,
+    paddingHorizontal: 5,
+    paddingVertical: 14,
+    marginHorizontal: 5,
+    backgroundColor: "#e6217f",
+    borderRadius: 999,
+  },
+  logButtonText: {
+    color: "#FFF",
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: 800,
+  },
+
+  closeButton: {
+    flex: 1,
+    paddingHorizontal: 5,
+    paddingVertical: 14,
+    marginHorizontal: 5,
+    backgroundColor: "#ffff",
+    borderRadius: 999,
+    borderColor: "#e6217f",
+    borderWidth: 2,
+  },
+  closeButtonText: {
+    color: "#e6217f",
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: 800,
   },
 });
 
