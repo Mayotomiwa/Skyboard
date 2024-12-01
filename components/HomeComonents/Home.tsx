@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import React from "react";
 import {
   Image,
@@ -13,6 +14,7 @@ interface Game {
   id: string;
   title: string;
   image: any;
+  description: string;
   backgroundColor: string;
 }
 
@@ -24,30 +26,39 @@ interface Gamer {
 }
 
 const Home: React.FC = () => {
+  const router = useRouter();
   const games: Game[] = [
     {
       id: "1",
       title: "Snooker Board",
       image: require("@/assets/images/snooker.png"),
       backgroundColor: "#A4D037",
+      description:
+        "Ludo is a classic board game that combines elements of strategy and luck. It is typically played by 2 to 4 players, each of whom controls four colored tokens. The objective of the game is to move all your tokens to a safer zone.",
     },
     {
       id: "2",
       title: "Ludo King",
       image: require("@/assets/images/ludo.png"),
       backgroundColor: "#FFB800",
+      description:
+        "Ludo is a classic board game that combines elements of strategy and luck. It is typically played by 2 to 4 players, each of whom controls four colored tokens. The objective of the game is to move all your tokens to a safer zone.",
     },
     {
       id: "3",
       title: "Scrabble",
       image: require("@/assets/images/scrabble.png"),
       backgroundColor: "#FF5C5C",
+      description:
+        "Ludo is a classic board game that combines elements of strategy and luck. It is typically played by 2 to 4 players, each of whom controls four colored tokens. The objective of the game is to move all your tokens to a safer zone.",
     },
     {
       id: "4",
       title: "Chess Chess",
       image: require("@/assets/images/chess.png"),
       backgroundColor: "#4EABFF",
+      description:
+        "Ludo is a classic board game that combines elements of strategy and luck. It is typically played by 2 to 4 players, each of whom controls four colored tokens. The objective of the game is to move all your tokens to a safer zone.",
     },
   ];
 
@@ -145,15 +156,43 @@ const Home: React.FC = () => {
 
         {/* Available Games */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>AVAILABLE GAMES</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              width: "100%",
+              marginBottom: 20
+            }}
+          >
+            <Text style={[styles.sectionTitle, { flex: 1 }]}>
+              AVAILABLE GAMES
+            </Text>
+            <TouchableOpacity onPress={() => router.push('/(page)/all-games')}>
+              <Text style={[styles.seeAllButton, { flexShrink: 1 }]}>
+                See all →
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           <View style={styles.gamesGrid}>
             {games.map((game) => (
               <TouchableOpacity
                 key={game.id}
                 style={[
                   styles.gameCard,
-                  {backgroundColor: game.backgroundColor}
+                  { backgroundColor: game.backgroundColor },
                 ]}
+                onPress={() => {
+                  router.push({
+                    pathname: "/(page)/game-entry",
+                    params: {
+                      title: game.title,
+                      description: game.description,
+                      image: game.image,
+                    },
+                  });
+                }}
               >
                 <Image source={game.image} style={styles.gameImage} />
                 <View style={styles.gameInfo}>
@@ -188,10 +227,7 @@ const Home: React.FC = () => {
                     { backgroundColor: gamer.backgroundColor },
                   ]}
                 >
-                  <Image
-                    source={gamer.avatar}
-                    style={styles.gamerImage}
-                  />
+                  <Image source={gamer.avatar} style={styles.gamerImage} />
                 </View>
                 <Text style={styles.gamerName}>{gamer.name}</Text>
               </View>
