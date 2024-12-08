@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import React from "react";
 import {
   Image,
@@ -152,7 +153,7 @@ const Home: React.FC = () => {
                 key={game.id}
                 style={[
                   styles.gameCard,
-                  {backgroundColor: game.backgroundColor}
+                  { backgroundColor: game.backgroundColor },
                 ]}
               >
                 <Image source={game.image} style={styles.gameImage} />
@@ -171,7 +172,7 @@ const Home: React.FC = () => {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>TOP GAMERS</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/allUsers")}>
               <Text style={styles.seeAllButton}>See all →</Text>
             </TouchableOpacity>
           </View>
@@ -188,10 +189,7 @@ const Home: React.FC = () => {
                     { backgroundColor: gamer.backgroundColor },
                   ]}
                 >
-                  <Image
-                    source={gamer.avatar}
-                    style={styles.gamerImage}
-                  />
+                  <Image source={gamer.avatar} style={styles.gamerImage} />
                 </View>
                 <Text style={styles.gamerName}>{gamer.name}</Text>
               </View>

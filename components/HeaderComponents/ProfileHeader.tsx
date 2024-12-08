@@ -4,19 +4,28 @@ import { ChevronLeft, Pen } from "lucide-react-native";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-
 // create a component
 const ProfileHeader = () => {
-    const router = useRouter();
+  const router = useRouter();
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Text style={styles.backIcon}><ChevronLeft color={'white'}/></Text>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Text style={styles.backIcon}>
+            <ChevronLeft color={"white"} />
+          </Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Profile</Text>
-        <TouchableOpacity style={styles.editButton}>
-          <Text style={styles.editIcon}><Pen color={'white'}/></Text>
+        <TouchableOpacity
+          onPress={() => router.push("/editProfile")}
+          style={styles.editButton}
+        >
+          <Text style={styles.editIcon}>
+            <Pen color={"white"} />
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

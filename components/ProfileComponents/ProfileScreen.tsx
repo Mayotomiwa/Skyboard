@@ -88,7 +88,10 @@ const ProfileSettings: React.FC = () => {
               style={styles.avatar}
               resizeMode="cover"
             />
-            <TouchableOpacity style={styles.editAvatarButton}>
+            <TouchableOpacity
+              onPress={() => router.push("/editProfile")}
+              style={styles.editAvatarButton}
+            >
               <Text style={styles.editAvatarIcon}>
                 <Edit color={"#D1B1D1"} />
               </Text>

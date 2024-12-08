@@ -11,6 +11,7 @@ export default function PageLayout() {
   };
   return (
     <Stack>
+      {/* Profile Components */}
       <Stack.Screen
         name="notification"
         options={{ header: () => <PageHeader title={"Notification"} /> }}
@@ -39,6 +40,32 @@ export default function PageLayout() {
       <Stack.Screen
         name="inviteFriends"
         options={{ header: () => <InviteHeader /> }}
+      />
+
+      <Stack.Screen
+        name="editProfile"
+        options={{ header: () => <PageHeader title={"Edit Profile"} /> }}
+      />
+
+      {/* Users */}
+      <Stack.Screen name="allUsers" options={{ header: () => null }} />
+
+      <Stack.Screen
+        name="usersProfile"
+        options={{ header: () => <PageHeader title={"Profile"} /> }}
+      />
+
+      <Stack.Screen name="chat" options={{ header: () => null }} />
+
+      {/* others */}
+
+      <Stack.Screen
+        name="tournaments"
+        options={{ header: () => <PageHeader title={"Tournaments"} /> }}
+      />
+      <Stack.Screen
+        name="fundHistory"
+        options={{ header: () => <PageHeader title={"Fund History"} /> }}
       />
     </Stack>
   );
