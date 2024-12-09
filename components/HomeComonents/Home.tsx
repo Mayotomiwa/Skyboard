@@ -210,7 +210,7 @@ const Home: React.FC = () => {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>TOP GAMERS</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/allUsers")}>
               <Text style={styles.seeAllButton}>See all →</Text>
             </TouchableOpacity>
           </View>
