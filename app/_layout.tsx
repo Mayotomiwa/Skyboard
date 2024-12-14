@@ -45,7 +45,12 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      {/* for regular */}
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> 
+      {/* for celebrity */}
+      <Stack.Screen name="(tab)" options={{ headerShown: false }} />
+
+      {/* general */}
       <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
       <Stack.Screen name="(modal)" options={{ headerShown: false }} />
       <Stack.Screen name="(page)" options={{ headerShown: false }} />

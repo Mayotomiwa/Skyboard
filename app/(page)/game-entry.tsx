@@ -49,7 +49,7 @@ const GameEntry = () => {
       >
         <Text style={styles.createLobbyText}>CREATE LOBBY</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.joinLobbyButton}>
+      <TouchableOpacity onPress={() => router.push('/(page)/join-game')} style={styles.joinLobbyButton}>
         <Text style={styles.joinLobbyText}>JOIN LOBBY</Text>
       </TouchableOpacity>
     </View>
@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 20,
+    marginTop: 50,
   },
   backButton: {
     fontSize: 18,

@@ -1,10 +1,11 @@
+import { useRouter } from 'expo-router';
 import React from 'react';
 import {
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 const players = [
@@ -20,11 +21,12 @@ const players = [
 ];
 
 const WaitingRoom = () => {
+  const router = useRouter();
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.back()}>
           <Text style={styles.backArrow}>{'←'}</Text>
         </TouchableOpacity>
         <Text style={styles.title}>SCRABBLE</Text>
@@ -76,6 +78,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 20,
     marginBottom: 20,
   },
   backArrow: {
