@@ -2,7 +2,7 @@ import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 // create a component
-const HomeHeader = () => {
+const CelebrityHomeHeader = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -13,9 +13,9 @@ const HomeHeader = () => {
           />
           <View>
             <Text style={styles.greeting}>
-              Hello <Text style={styles.username}>Jolomi</Text>
+              Hello <Text style={styles.username}>Steph</Text>
             </Text>
-            <Text style={styles.welcomeText}>Welcome back to your winning</Text>
+            <Text style={styles.welcomeText}>Welcome back to hosting</Text>
           </View>
         </View>
         <View style={styles.headerIcons}>
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#E75B99",
+    backgroundColor: "#3f9217",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -206,4 +206,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeHeader;
+export default CelebrityHomeHeader;
