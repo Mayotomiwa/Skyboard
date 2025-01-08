@@ -1,5 +1,6 @@
+import { useProfileStore } from "@/zustand/profileStore";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Image,
   SafeAreaView,
@@ -27,6 +28,13 @@ interface Gamer {
 
 const CelebrityHome: React.FC = () => {
   const router = useRouter();
+    // Zustand store methods and state
+    const { user, getUserProfile, isLoading, error } = useProfileStore();
+
+    // Fetch user profile on component mount
+    useEffect(() => {
+      getUserProfile();
+    }, [getUserProfile]);
   const games: Game[] = [
     {
       id: "1",
@@ -134,19 +142,24 @@ const CelebrityHome: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        {/* Header */}
 
         {/* Balance Card */}
         <View style={styles.balanceCard}>
           <View style={styles.balanceInfo}>
-            <Text style={styles.balanceLabel}>Total Amount</Text>
-            <Text style={styles.balanceAmount}>N6,000,000.00</Text>
+            <Text style={styles.balanceLabel}>Wallet Balance</Text>
+            <Text style={styles.balanceAmount}>
+              {user ? `₦${user.walletBalance.toLocaleString()}` : "0.00"}
+            </Text>
           </View>
           <View style={styles.balanceActions}>
-            <TouchableOpacity style={[styles.actionButton, styles.fundButton]}>
+            <TouchableOpacity
+              onPress={() => router.push("/(page)/c-deposit")}
+              style={[styles.actionButton, styles.fundButton]}
+            >
               <Text style={styles.actionButtonText}>+ Fund your balance</Text>
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={() => router.push("/(page)/c-withdraw")}
               style={[styles.actionButton, styles.withdrawButton]}
             >
               <Text style={styles.actionButtonText}>- Withdraw your wins</Text>
@@ -168,10 +181,10 @@ const CelebrityHome: React.FC = () => {
             <Text style={[styles.sectionTitle, { flex: 1 }]}>
               AVAILABLE GAMES
             </Text>
-            <TouchableOpacity onPress={() => router.push("/(page)/all-games")}>
-              {/* <Text style={[styles.seeAllButton, { flexShrink: 1 }]}>
+            <TouchableOpacity onPress={() => router.push("/(tab)/top-games")}>
+              <Text style={[styles.seeAllButton, { flexShrink: 1 }]}>
                 See all →
-              </Text> */}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -184,14 +197,7 @@ const CelebrityHome: React.FC = () => {
                   { backgroundColor: game.backgroundColor },
                 ]}
                 onPress={() => {
-                  router.push({
-                    pathname: "/(page)/game-entry",
-                    params: {
-                      title: game.title,
-                      description: game.description,
-                      image: game.image,
-                    },
-                  });
+                  router.push("/(page)/host-games");
                 }}
               >
                 <Image source={game.image} style={styles.gameImage} />
@@ -411,6 +417,19 @@ const styles = StyleSheet.create({
   },
   navItem: {
     padding: 8,
+  },
+  loadingText: {
+    color: "yellow",
+    fontSize: 12,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 12,
+  },
+  usernameInitial: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });
 

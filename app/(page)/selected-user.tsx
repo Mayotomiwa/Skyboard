@@ -5,6 +5,18 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const SelectedUser = () => {
     const router = useRouter();
+
+    const handleGameDisplay = () => {
+      router.push({
+        pathname: '/(games)/ludo',
+        params: {
+          gameId: 'generated_game_id',
+          playerId: 'current_player_id',
+          opponentId: 'opponent_id',
+          stakeAmount: 'stakeAmount'
+        }
+      });
+    }
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -58,7 +70,7 @@ const SelectedUser = () => {
       </View>
 
       {/* Play Button */}
-      <TouchableOpacity style={styles.playButton}>
+      <TouchableOpacity style={styles.playButton} onPress={handleGameDisplay}>
         <Text style={styles.playButtonText}>PLAY GAME</Text>
       </TouchableOpacity>
 

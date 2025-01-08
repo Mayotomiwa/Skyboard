@@ -1,7 +1,8 @@
+import { useProfileStore } from "@/zustand/profileStore";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import { ChevronRight, Edit } from "lucide-react-native";
-import React, { useState } from "react";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -15,72 +16,40 @@ import {
   View,
 } from "react-native";
 
-interface MenuItem {
-  id: string;
-  title: string;
-  icon: string;
-  isLogout?: boolean;
-  hasArrow?: boolean;
-  route: string;
-}
 const { height } = Dimensions.get("window");
 
 const ProfileSettings: React.FC = () => {
+  const { user, getUserProfile, isLoading, error } = useProfileStore();
   const [isModalVisible, setModalVisible] = useState(false);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
 
-  const menuItems: MenuItem[] = [
-    {
-      id: "1",
-      title: "Notification",
-      icon: "🔔",
-      hasArrow: true,
-      route: "/notification",
-    },
-    {
-      id: "2",
-      title: "Security",
-      icon: "🔒",
-      hasArrow: true,
-      route: "/security",
-    },
-    {
-      id: "3",
-      title: "Help",
-      icon: "ℹ️",
-      hasArrow: true,
-      route: "/help",
-    },
-    {
-      id: "4",
-      title: "Invite Friends",
-      icon: "👥",
-      hasArrow: true,
-      route: "/inviteFriends",
-    },
-    {
-      id: "5",
-      title: "Bank Account",
-      icon: "🏦",
-      hasArrow: true,
-      route: "/bank",
-    },
-    {
-      id: "6",
-      title: "Logout",
-      icon: "🚪",
-      isLogout: true,
-      route: "",
-    },
+  useEffect(() => {
+    getUserProfile();
+  }, [getUserProfile]);
+
+  if (isLoading) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (error) {
+    return <Text>Error: {error}</Text>;
+  }
+
+  const menuItems = [
+    { id: "1", title: "Notification", icon: "🔔", hasArrow: true, route: "/notification" },
+    { id: "2", title: "Security", icon: "🔒", hasArrow: true, route: "/security" },
+    { id: "3", title: "Help", icon: "ℹ️", hasArrow: true, route: "/help" },
+    { id: "4", title: "Invite Friends", icon: "👥", hasArrow: true, route: "/reg-inviteFriends" },
+    { id: "5", title: "Bank Account", icon: "🏦", hasArrow: true, route: "/bank" },
+    { id: "6", title: "Logout", icon: "🚪", isLogout: true, route: "" },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        {/* Profile Section */}
         <View style={styles.profileSection}>
           <View style={styles.avatarContainer}>
             <Image
@@ -89,7 +58,7 @@ const ProfileSettings: React.FC = () => {
               resizeMode="cover"
             />
             <TouchableOpacity
-              onPress={() => router.push("/editProfile")}
+              onPress={() => router.push("/(pages)/reg-editProfile")}
               style={styles.editAvatarButton}
             >
               <Text style={styles.editAvatarIcon}>
@@ -98,19 +67,16 @@ const ProfileSettings: React.FC = () => {
             </TouchableOpacity>
           </View>
           <View>
-            <Text style={styles.name}>Jolomi Steph</Text>
-            <Text style={styles.email}>jolomisteph@yourdomain.com</Text>
-            <Text style={styles.location}>Nigeria</Text>
+            <Text style={styles.name}>{user?.username || "Guest User"}</Text>
+            <Text style={styles.email}>{user?.email || "No Email Available"}</Text>
+            <Text style={styles.location}>{"Nigeria" /* Adjust if necessary */}</Text>
           </View>
         </View>
 
-        {/* Menu Items */}
         <View style={styles.menuSection}>
           {menuItems.map((item) => (
             <TouchableOpacity
-              onPress={() =>
-                item.isLogout ? toggleModal() : router.push(item.route)
-              }
+              onPress={() => (item.isLogout ? toggleModal() : router.push(item.route))}
               key={item.id}
               style={[styles.menuItem, item.isLogout && styles.logoutItem]}
             >
@@ -139,19 +105,13 @@ const ProfileSettings: React.FC = () => {
 
       <Modal
         animationType="slide"
-        transparent={true}
+        transparent
         visible={isModalVisible}
         onRequestClose={toggleModal}
       >
         <Pressable style={styles.overlay} onPress={toggleModal} />
         <View style={styles.modalContainer}>
-          <MaterialIcons
-            name="exit-to-app"
-            size={54}
-            color="#E75B99"
-            style={styles.modalTitle}
-          />
-
+          <MaterialIcons name="exit-to-app" size={54} color="#E75B99" style={styles.modalTitle} />
           <Text style={styles.modalText}>Are you sure you want to logout?</Text>
           <View
             style={[

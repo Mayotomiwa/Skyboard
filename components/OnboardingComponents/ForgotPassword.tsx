@@ -1,6 +1,8 @@
+import { useAuthStore } from '@/zustand/authStore';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -12,25 +14,27 @@ import {
 } from 'react-native';
 
 interface ForgotPasswordProps {
-  onSubmit?: (email: string) => void;
   onBack?: () => void;
 }
 
-const ForgotPassword: React.FC<ForgotPasswordProps> = ({
-  onSubmit,
-  onBack,
-}) => {
-    const router = useRouter();
+const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack }) => {
+  const router = useRouter();
   const [email, setEmail] = useState('');
+  const forgotPassword = useAuthStore((state) => state.forgotPassword);
 
-  const handleSubmit = () => {
-    onSubmit?.(email);
-    router.replace('/(onboarding)/verification-code')
+  const handleSubmit = async () => {
+    try {
+      await forgotPassword({ email });
+      Alert.alert('Success', 'OTP has been sent to your email');
+      router.replace('/(onboarding)/change-password');
+    } catch (error) {
+      Alert.alert('Error', error?.toString() || 'Failed to send OTP. Please try again.');
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingContainer}
       >
@@ -65,7 +69,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({
         </View>
 
         {/* Continue Button */}
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.continueButton, !email && styles.continueButtonDisabled]}
           onPress={handleSubmit}
           disabled={!email}

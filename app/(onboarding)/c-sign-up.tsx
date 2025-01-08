@@ -1,18 +1,62 @@
+import { useUserStore } from "@/zustandCelebrity/authStore";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const CreateAccountScreen = () => {
-    const router = useRouter()
-  const [selectedPlatform, setSelectedPlatform] = useState("Instagram");
+  const router = useRouter();
+  const { registerCelebrity } = useUserStore();
+  const [loading, setLoading] = useState<boolean>(false);
+
+  // Form data state
+  const [formData, setFormData] = useState({
+    socialMediaHandle: "",
+    phoneNumber: "",
+    email: "",
+    password: "",
+    socialMediaPlatform: "Instagram",
+  });
+
+  // Handler to update form data
+  const handleChange = (key: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSubmit = async () => {
+    // Validate data if needed, then submit
+    if (
+      !formData.email ||
+      !formData.password ||
+      !formData.phoneNumber ||
+      !formData.socialMediaHandle ||
+      !formData.socialMediaPlatform
+    ) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+    setLoading(true);
+    try {
+      await registerCelebrity(formData);
+      console.log("User registered successfully");
+      router.push("/(modal)/success-modal");
+    } catch (error: any) {
+      console.error("Registration failed:", error);
+      Alert.alert("Registration failed", error.toString());
+    } finally {
+      setLoading(false);
+    }
+    router.replace("/(modal)/c-success"); // Navigate after submission
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -28,26 +72,61 @@ const CreateAccountScreen = () => {
 
       {/* Input Fields */}
       <View style={styles.form}>
-        <TextInput style={styles.input} placeholder="@kingjolomi1" placeholderTextColor="#999" />
-        
+        {/* Social Media Handle */}
+        <TextInput
+          style={styles.input}
+          placeholder="@kingjolomi1"
+          placeholderTextColor="#999"
+          value={formData.socialMediaHandle}
+          onChangeText={(text) => handleChange("socialMediaHandle", text)}
+        />
+
         {/* Dropdown */}
         <View style={styles.pickerContainer}>
           <Picker
-            selectedValue={selectedPlatform}
-            onValueChange={(itemValue) => setSelectedPlatform(itemValue)}
+            selectedValue={formData.socialMediaPlatform}
+            onValueChange={(value) =>
+              handleChange("socialMediaPlatform", value)
+            }
             style={styles.picker}
             dropdownIconColor="white"
           >
             <Picker.Item label="Instagram" value="Instagram" />
             <Picker.Item label="Facebook" value="Facebook" />
             <Picker.Item label="Twitter" value="Twitter" />
+            <Picker.Item label="TikTok" value="TikTok" />
           </Picker>
         </View>
 
-        <TextInput style={styles.input} placeholder="(+234) 000 0000 000" placeholderTextColor="#999" keyboardType="phone-pad" />
-        <TextInput style={styles.input} placeholder="Email :" placeholderTextColor="#999" keyboardType="email-address" />
-        <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#999" secureTextEntry />
-        <TextInput style={styles.input} placeholder="Confirm Password" placeholderTextColor="#999" secureTextEntry />
+        {/* Phone Number */}
+        <TextInput
+          style={styles.input}
+          placeholder="(+234) 000 0000 000"
+          placeholderTextColor="#999"
+          keyboardType="phone-pad"
+          value={formData.phoneNumber}
+          onChangeText={(text) => handleChange("phoneNumber", text)}
+        />
+
+        {/* Email */}
+        <TextInput
+          style={styles.input}
+          placeholder="Email :"
+          placeholderTextColor="#999"
+          keyboardType="email-address"
+          value={formData.email}
+          onChangeText={(text) => handleChange("email", text)}
+        />
+
+        {/* Password */}
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor="#999"
+          secureTextEntry
+          value={formData.password}
+          onChangeText={(text) => handleChange("password", text)}
+        />
 
         {/* Terms Checkbox */}
         <View style={styles.checkboxContainer}>
@@ -60,8 +139,16 @@ const CreateAccountScreen = () => {
       </View>
 
       {/* Continue Button */}
-      <TouchableOpacity onPress={() => router.replace('/(tab)')} style={styles.button}>
-        <Text style={styles.buttonText}>CONTINUE</Text>
+      <TouchableOpacity
+        onPress={handleSubmit}
+        style={styles.button}
+        disabled={loading}
+      >
+        {!loading ? (
+          <Text style={styles.buttonText}>CONTINUE</Text>
+        ) : (
+          <ActivityIndicator size={"small"} color={"white"} />
+        )}
       </TouchableOpacity>
     </ScrollView>
   );

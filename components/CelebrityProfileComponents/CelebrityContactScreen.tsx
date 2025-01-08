@@ -1,15 +1,15 @@
+import { Ionicons } from "@expo/vector-icons"; // Ensure you have installed @expo/vector-icons
 import React, { useState } from "react";
 import {
+  KeyboardAvoidingView,
+  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Platform,
-  KeyboardAvoidingView,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // Ensure you have installed @expo/vector-icons
 
 const CelebrityContactScreen: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     height: 56,
-    backgroundColor: "#3f9217",
+    backgroundColor: "#56920D",
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",

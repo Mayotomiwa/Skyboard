@@ -1,123 +1,228 @@
-import { ChevronDown, ChevronLeft } from "lucide-react-native";
-import React, { useState } from "react";
+import { useAuthStore } from "@/zustand/authStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { useRouter } from "expo-router";
+import { ChevronLeft } from "lucide-react-native";
+import React, { useEffect, useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from "react-native";
 
-interface FormData {
-  firstName: string;
-  lastName: string;
-  country: string;
-  phone: string;
+interface SignUpFormData {
+  email: string;
+  password: string;
+  username: string;
+  phoneNumber: string;
+  dob: string;
 }
 
-const SignUp: React.FC<{
-  initialData: Partial<FormData>;
-  onContinue: (data: Partial<FormData>) => void;
-}> = ({ initialData, onContinue }) => {
-  const [formData, setFormData] = useState<FormData>({
-    firstName: initialData.firstName || "",
-    lastName: initialData.lastName || "",
-    country: initialData.country || "",
-    phone: initialData.phone || "",
+const SignUpScreen: React.FC = () => {
+  const router = useRouter();
+  const { register } = useAuthStore();
+
+  const [isStoreReady, setIsStoreReady] = useState(false);
+
+  useEffect(() => {
+    const initializeStore = async () => {
+      try {
+        await AsyncStorage.getItem('auth-storage');
+        setIsStoreReady(true);
+      } catch (error) {
+        console.error('Failed to initialize store:', error);
+        setIsStoreReady(true); // Still set to true to show the UI
+      }
+    };
+    
+    initializeStore();
+  }, []);
+
+  if (!isStoreReady) {
+    return (
+      <View style={styles.container}>
+        <Text style={[styles.title, { textAlign: 'center' }]}>Loading...</Text>
+      </View>
+    );
+  }
+  
+  const [formData, setFormData] = useState<SignUpFormData>({
+    email: "",
+    password: "",
+    username: "",
+    phoneNumber: "",
+    dob: "",
   });
 
-  const handleInputChange = (key: keyof FormData, value: string) => {
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleInputChange = (key: keyof SignUpFormData, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [key]: value,
     }));
   };
 
-  const handleContinue = () => {
-    onContinue(formData);
+  const handleDateChange = (event: any, selectedDate: Date | undefined) => {
+    const currentDate = selectedDate || new Date();
+    setShowDatePicker(Platform.OS === "ios");
+    
+    // Format date as ISO string
+    const isoDate = currentDate.toISOString();
+    setFormData((prev) => ({
+      ...prev,
+      dob: isoDate,
+    }));
   };
+
+  const handleSignUp = async () => {
+    // Validate form data
+    if (!formData.email || !formData.password || !formData.username || !formData.phoneNumber || !formData.dob) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await register(formData);
+      console.log("User registered successfully");
+      router.push("/(modal)/success-modal");
+    } catch (error: any) {
+      console.error("Registration failed:", error);
+      Alert.alert("Registration failed", error.toString());
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      {/* Header with back button */}
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => {
-            /* Handle navigation */
-          }}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <ChevronLeft color="#fff" size={24} />
         </TouchableOpacity>
       </View>
 
-      {/* Progress Bar */}
-      <View style={styles.progressBarContainer}>
-        <View style={styles.progressBar} />
-      </View>
+      <ScrollView style={styles.content} keyboardShouldPersistTaps="handled">
+        <Text style={styles.title}>Create an account</Text>
+        <Text style={styles.subtitle}>Complete your profile to get started</Text>
 
-      {/* Title Section */}
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>
-          <Text style={styles.titlePink}>Create an </Text>
-          account
-        </Text>
-        <Text style={styles.subtitle}>Please complete your profile</Text>
-      </View>
-
-      {/* Form */}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.formContainer}
-      >
-        <TextInput
-          style={styles.input}
-          placeholder="First Name"
-          value={formData.firstName}
-          onChangeText={(text) => handleInputChange("firstName", text)}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Last Name"
-          value={formData.lastName}
-          onChangeText={(text) => handleInputChange("lastName", text)}
-        />
-
-        <TouchableOpacity
-          style={[styles.input, styles.countrySelect]}
-          onPress={() => {
-            /* Handle country selection */
-          }}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.form}
         >
-          <Text
-            style={[styles.inputText, !formData.country && styles.placeholder]}
+          <TextInput
+            style={styles.input}
+            placeholder="Username"
+            placeholderTextColor="#666"
+            value={formData.username}
+            onChangeText={(text) => handleInputChange("username", text)}
+            autoCapitalize="none"
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Email address"
+            placeholderTextColor="#666"
+            value={formData.email}
+            onChangeText={(text) => handleInputChange("email", text)}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={[styles.input, styles.passwordInput]}
+              placeholder="Password"
+              placeholderTextColor="#666"
+              secureTextEntry={!showPassword}
+              value={formData.password}
+              onChangeText={(text) => handleInputChange("password", text)}
+              autoCapitalize="none"
+            />
+            <TouchableOpacity
+              style={styles.eyeButton}
+              onPress={() => setShowPassword(!showPassword)}
+            >
+              <Text style={styles.eyeText}>{showPassword ? "👁️" : "🙈"}</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Phone Number"
+            placeholderTextColor="#666"
+            value={formData.phoneNumber}
+            onChangeText={(text) => handleInputChange("phoneNumber", text)}
+            keyboardType="phone-pad"
+          />
+
+          <TouchableOpacity
+            style={styles.input}
+            onPress={() => setShowDatePicker(true)}
           >
-            {formData.country || "Select your country"}
-          </Text>
-          <ChevronDown color={"black"} size={20} />
-        </TouchableOpacity>
+            <Text style={[styles.inputText, !formData.dob && styles.placeholder]}>
+              {formData.dob
+                ? new Date(formData.dob).toLocaleDateString()
+                : "Select Date of Birth"}
+            </Text>
+          </TouchableOpacity>
 
-        <TextInput
-          style={styles.input}
-          placeholder="(+234) 000 0000 000"
-          value={formData.phone}
-          onChangeText={(text) => handleInputChange("phone", text)}
-          keyboardType="phone-pad"
-        />
+          {showDatePicker && (
+            <DateTimePicker
+              value={formData.dob ? new Date(formData.dob) : new Date()}
+              mode="date"
+              display="default"
+              onChange={handleDateChange}
+            />
+          )}
 
-        <TouchableOpacity
-          style={styles.continueButton}
-          onPress={handleContinue}
-        >
-          <Text style={styles.continueText}>CONTINUE</Text>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
+          <View style={styles.dividerContainer}>
+            <View style={styles.divider} />
+            <Text style={styles.dividerText}>or</Text>
+            <View style={styles.divider} />
+          </View>
+
+          <TouchableOpacity style={styles.socialButton}>
+            <Image
+              source={{ uri: "https://www.google.com/favicon.ico" }}
+              style={styles.socialIcon}
+            />
+            <Text style={styles.socialButtonText}>Sign up with Google</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.socialButton}>
+            <Image
+              source={{ uri: "https://www.apple.com/favicon.ico" }}
+              style={styles.socialIcon}
+            />
+            <Text style={styles.socialButtonText}>Sign up with Apple</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.signUpButton, loading && styles.signUpButton_disabled]}
+            onPress={handleSignUp}
+            disabled={loading}
+          >
+            <Text style={styles.signUpButtonText}>
+              {loading ? "SIGNING UP..." : "SIGN UP"}
+            </Text>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -125,7 +230,7 @@ const SignUp: React.FC<{
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1a1624",
+    backgroundColor: "#1a1625",
   },
   header: {
     height: 44,
@@ -137,39 +242,22 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
   },
-  progressBarContainer: {
-    height: 4,
-    backgroundColor: "rgba(255,255,255,0.1)",
-    marginHorizontal: 20,
-    borderRadius: 2,
-  },
-  progressBar: {
-    height: "100%",
-    width: "40%",
-    backgroundColor: "#e6217f",
-    borderRadius: 2,
-  },
-  titleContainer: {
-    marginTop: 32,
-    paddingHorizontal: 20,
+  content: {
+    flex: 1,
+    padding: 20,
   },
   title: {
-    fontSize: 24,
-    color: "#fff",
-    fontWeight: "600",
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#e75480",
     marginBottom: 8,
   },
-  titlePink: {
-    color: "#e6217f",
-  },
   subtitle: {
-    fontSize: 14,
-    color: "rgba(255,255,255,0.6)",
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 30,
   },
-  formContainer: {
-    flex: 1,
-    marginTop: 32,
-    paddingHorizontal: 20,
+  form: {
     gap: 16,
   },
   input: {
@@ -180,32 +268,75 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#000",
   },
-  countrySelect: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
   inputText: {
     fontSize: 16,
     color: "#000",
+    paddingTop: 15,
   },
   placeholder: {
-    color: "black",
-    opacity: 0.7,
+    color: "#666",
   },
-  continueButton: {
+  passwordContainer: {
+    position: "relative",
+  },
+  passwordInput: {
+    paddingRight: 50,
+  },
+  eyeButton: {
+    position: "absolute",
+    right: 15,
+    top: 15,
+  },
+  eyeText: {
+    fontSize: 20,
+    opacity: 0.5,
+  },
+  dividerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 20,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#2a2535",
+  },
+  dividerText: {
+    color: "#666",
+    paddingHorizontal: 10,
+  },
+  socialButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 15,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#2a2535",
+    marginBottom: 10,
+  },
+  socialIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 10,
+  },
+  socialButtonText: {
+    color: "white",
+    fontSize: 16,
+  },
+  signUpButton: {
     height: 56,
-    backgroundColor: "#e6217f",
+    backgroundColor: "#e75480",
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: "auto",
+    marginTop: 10,
     marginBottom: Platform.OS === "ios" ? 0 : 20,
   },
-  continueButton_disabled: {
-    backgroundColor: "rgba(230,33,127,0.5)",
+  signUpButton_disabled: {
+    backgroundColor: "rgba(231,84,128,0.5)",
   },
-  continueText: {
+  signUpButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
@@ -213,4 +344,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignUp;
+export default SignUpScreen;

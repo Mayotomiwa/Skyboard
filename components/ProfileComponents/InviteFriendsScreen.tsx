@@ -1,11 +1,27 @@
-import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import * as Contacts from "expo-contacts";
+import * as SMS from "expo-sms";
+import React, { useEffect, useState } from "react";
+import {
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+interface Contact {
+  imageUri: any;
+  name: string;
+  number: string;
+}
 
 interface UserItemProps {
   imageUri: any;
-  name: string; // User name
-  number: string; // User number
-  onInvite: () => void; // Invite button action
+  name: string;
+  number: string;
+  onInvite: () => void;
 }
 
 const UserItem: React.FC<UserItemProps> = ({
@@ -16,16 +32,14 @@ const UserItem: React.FC<UserItemProps> = ({
 }) => {
   return (
     <View style={styles.userItem}>
-      {/* User Image */}
-      <Image source={imageUri} style={styles.userImage} />
-
-      {/* User Details */}
+      <Image
+        source={require("@/assets/images/Avatar.png")}
+        style={styles.userImage}
+      />
       <View style={styles.userDetails}>
         <Text style={styles.userName}>{name}</Text>
         <Text style={styles.userNumber}>{number}</Text>
       </View>
-
-      {/* Invite Button */}
       <TouchableOpacity style={styles.inviteButton} onPress={onInvite}>
         <Text style={styles.inviteButtonText}>Invite</Text>
       </TouchableOpacity>
@@ -34,47 +48,114 @@ const UserItem: React.FC<UserItemProps> = ({
 };
 
 const InviteFriendsScreen: React.FC = () => {
-  // Define user data
-  const users = [
-    {
-      imageUri: require("@/assets/images/friend.png"),
-      name: "John Doe",
-      number: "123-456-7890",
-    },
-    {
-      imageUri: require("@/assets/images/friend1.png"),
-      name: "Jane Smith",
-      number: "098-765-4321",
-    },
-    {
-      imageUri: require("@/assets/images/friend2.png"),
-      name: "Alice Johnson",
-      number: "112-233-4455",
-    },
-  ];
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const loadContacts = async () => {
+    try {
+      const { status } = await Contacts.requestPermissionsAsync();
+      if (status === "granted") {
+        const { data } = await Contacts.getContactsAsync({
+          fields: [
+            Contacts.Fields.PhoneNumbers,
+            Contacts.Fields.Image,
+            Contacts.Fields.FirstName,
+            Contacts.Fields.LastName,
+          ],
+        });
+
+        if (data.length > 0) {
+          const formattedContacts: Contact[] = data
+            .filter(
+              (contact) =>
+                contact.phoneNumbers && contact.phoneNumbers.length > 0
+            )
+            .map((contact) => ({
+              imageUri: contact.image?.uri || null, // Default to `null` if no image
+              name: `${contact.firstName || ""} ${
+                contact.lastName || ""
+              }`.trim(),
+              number: contact.phoneNumbers?.[0]?.number || "", // Ensure `number` is always a string
+            }))
+            .filter((contact) => contact.number); // Filter out contacts with empty numbers
+          setContacts(formattedContacts);
+        }
+      } else {
+        Alert.alert(
+          "Permission Required",
+          "Please grant contacts permission to invite your friends."
+        );
+      }
+    } catch (error) {
+      console.error("Error loading contacts:", error);
+      Alert.alert("Error", "Failed to load contacts");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadContacts();
+  }, []);
+
+  const handleInvite = async (phoneNumber: string) => {
+    try {
+      const isAvailable = await SMS.isAvailableAsync();
+      if (isAvailable) {
+        const message = "Hey! I'd like to invite you to join our app!"; // Customize this message
+        await SMS.sendSMSAsync([phoneNumber], message);
+      } else {
+        Alert.alert("Error", "SMS is not available on this device");
+      }
+    } catch (error) {
+      console.error("Error sending SMS:", error);
+      Alert.alert("Error", "Failed to send SMS");
+    }
+  };
 
   return (
     <View style={styles.container}>
-      {users.map((user, index) => (
-        <UserItem
-          key={index}
-          imageUri={user.imageUri}
-          name={user.name}
-          number={user.number}
-          onInvite={() => console.log(`Invite sent to ${user.name}`)}
-        />
-      ))}
+      {isLoading ? (
+        <Text style={styles.loadingText}>Loading contacts...</Text>
+      ) : contacts.length === 0 ? (
+        <Text style={styles.emptyText}>
+          No contacts found. Please check your contact list or permissions.
+        </Text>
+      ) : (
+        <ScrollView>
+          {contacts.map((contact, index) => (
+            <UserItem
+              key={index}
+              imageUri={contact.imageUri}
+              name={contact.name}
+              number={contact.number}
+              onInvite={() => handleInvite(contact.number)}
+            />
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 };
-
-export default InviteFriendsScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#130828",
     padding: 20,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: "#FFFFFF",
+    textAlign: "center",
+    marginTop: 50,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#FFFFFF",
+    textAlign: "center",
+    marginTop: 450,
+    justifyContent: "center",
   },
   userItem: {
     flexDirection: "row",
@@ -92,7 +173,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   userDetails: {
-    flex: 1, // Allow details to grow and take up available space
+    flex: 1,
   },
   userName: {
     fontSize: 14,
@@ -116,3 +197,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
+
+
+export default InviteFriendsScreen;

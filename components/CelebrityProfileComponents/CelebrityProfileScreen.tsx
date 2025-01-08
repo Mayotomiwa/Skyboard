@@ -1,7 +1,7 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import { ChevronRight, Edit } from "lucide-react-native";
 import React, { useState } from "react";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import {
   Dimensions,
   Image,
@@ -89,7 +89,7 @@ const CelebrityProfileSettings: React.FC = () => {
               resizeMode="cover"
             />
             <TouchableOpacity
-              onPress={() => router.push("/editProfile")}
+              onPress={() => router.push("/(page)/editProfile")}
               style={styles.editAvatarButton}
             >
               <Text style={styles.editAvatarIcon}>

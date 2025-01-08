@@ -1,9 +1,9 @@
+import { Ionicons } from "@expo/vector-icons"; // Import Expo Ionicons
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // Import Expo Ionicons
 
 interface FundHistoryItemProps {
-  type: "added" | "withdrawal"; // Transaction type (added or withdrawal)
+  type:string | "added" | "withdrawal"; // Transaction type (added or withdrawal)
   refCode: string; // Reference code
   amount: number; // Transaction amount
   date: string; // Date of transaction

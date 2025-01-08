@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { LucideProps, Star, User } from "lucide-react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   StatusBar,
@@ -29,27 +29,64 @@ const accountOptions: AccountOption[] = [
   },
 ];
 
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
+
 const UserSelection: React.FC = () => {
   const router = useRouter();
+  const [isReady, setIsReady] = useState(false);
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const backgroundColorAnim = useRef(new Animated.Value(0)).current;
 
+  // Initialize animation system
+  useEffect(() => {
+    const initAnimation = async () => {
+      try {
+        // Ensure animation system is ready
+        await new Promise(resolve => setTimeout(resolve, 100));
+        setIsReady(true);
+      } catch (error) {
+        console.error('Animation initialization error:', error);
+        // Fall back to ready state even if animation fails
+        setIsReady(true);
+      }
+    };
+
+    initAnimation();
+  }, []);
+
   const handleAccountTypeSelect = (id: string) => {
     setSelectedType(id);
-    Animated.timing(backgroundColorAnim, {
-      toValue: id === "celebrity" ? 1 : 0,
-      duration: 300, // Adjust for animation speed
-      useNativeDriver: false, // Native driver doesn't support backgroundColor
-    }).start();
+    
+    // Wrap animation in try-catch for stability
+    try {
+      Animated.timing(backgroundColorAnim, {
+        toValue: id === "celebrity" ? 1 : 0,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    } catch (error) {
+      console.error('Animation error:', error);
+      // Fallback to direct state update if animation fails
+      setSelectedType(id);
+    }
   };
 
   const handleContinue = () => {
-    if (selectedType === "regular") {
-      router.push("/(onboarding)/sign-up");
-    } else if (selectedType === "celebrity") {
-      router.push("/(onboarding)/c-sign-up");
-    } else {
+    if (!selectedType) {
       alert("Please select an account type to continue.");
+      return;
+    }
+
+    try {
+      if (selectedType === "regular") {
+        router.push("/(onboarding)/sign-up");
+      } else {
+        router.push("/(onboarding)/c-sign-up");
+      }
+    } catch (error) {
+      console.error('Navigation error:', error);
+      // Fallback alert if navigation fails
+      alert("Navigation failed. Please try again.");
     }
   };
 
@@ -58,21 +95,43 @@ const UserSelection: React.FC = () => {
     outputRange: ["#e6217f", "#56920D"],
   });
 
+  // Show loading state while initializing
+  if (!isReady) {
+    return (
+      <View style={styles.container}>
+        <StatusBar barStyle="light-content" />
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
-    <Animated.View
-      style={[styles.container, { backgroundColor: interpolatedBackgroundColor }]}
-    >
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" />
 
       {/* Progress Bar */}
       <View style={styles.progressBarContainer}>
-        <View style={styles.progressBar} />
+        <Animated.View 
+          style={[
+            styles.progressBar, 
+            { backgroundColor: interpolatedBackgroundColor }
+          ]} 
+        />
       </View>
 
       {/* Header */}
       <View style={styles.headerContainer}>
         <Text style={styles.title}>
-          <Text style={styles.titlePink}>What type of </Text>
+          <Text 
+            style={[
+              styles.titlePink, 
+              { color: selectedType === "celebrity" ? "#56920D" : "#e6217f" }
+            ]}
+          >
+            What type of{" "}
+          </Text>
           account do{"\n"}you like to create?
         </Text>
         <Text style={styles.subtitle}>You can skip it if you are not sure</Text>
@@ -89,7 +148,10 @@ const UserSelection: React.FC = () => {
               key={option.id}
               style={[
                 styles.optionButton,
-                isSelected && styles.optionButtonSelected,
+                isSelected && [
+                  styles.optionButtonSelected, 
+                  { backgroundColor: selectedType === "celebrity" ? "#56920D" : "#e6217f" }
+                ],
               ]}
               onPress={() => handleAccountTypeSelect(option.id)}
               activeOpacity={0.7}
@@ -100,10 +162,7 @@ const UserSelection: React.FC = () => {
                   isSelected && styles.iconContainerSelected,
                 ]}
               >
-                <Icon
-                  color={isSelected ? "#fff" : "#e6217f"}
-                  size={24}
-                />
+                <Icon color={isSelected ? "#fff" : "#e6217f"} size={24} />
               </View>
               <Text
                 style={[
@@ -117,21 +176,40 @@ const UserSelection: React.FC = () => {
           );
         })}
       </View>
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={styles.getStartedButton}
+          style={[
+            styles.getStartedButton, 
+            { 
+              backgroundColor: selectedType === "celebrity" ? "#56920D" : "#e6217f",
+              opacity: selectedType ? 1 : 0.7
+            }
+          ]}
           onPress={handleContinue}
+          disabled={!selectedType}
         >
           <Text style={styles.getStartedText}>CONTINUE</Text>
         </TouchableOpacity>
       </View>
-    </Animated.View>
+    </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#1a1624',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: '#fff',
+    fontSize: 16,
   },
   progressBarContainer: {
     height: 4,

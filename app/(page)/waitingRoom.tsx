@@ -1,152 +1,234 @@
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  Animated,
   Image,
+  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View
 } from 'react-native';
 
-const players = [
-  { id: '1', avatar: 'require("@/assets/images/Avatar.png")', borderColor: '#00FFD1' },
-  { id: '2', avatar: 'require("@/assets/images/Avatar2.png")', borderColor: '#FFC700' },
-  { id: '3', avatar: 'require("@/assets/images/Avatar4.png")', borderColor: '#FF79C2' },
-  { id: '4', avatar: 'require("@/assets/images/Avatar3.png")', borderColor: '#00FFD1' },
-  { id: '5', avatar: 'require("@/assets/images/Avatar5.png")', borderColor: '#FFC700' },
-  { id: '6', avatar: 'require("@/assets/images/Avatar.png")', borderColor: '#FF79C2' },
-  { id: '7', avatar: 'require("@/assets/images/Avatar3.png")', borderColor: '#00FFD1' },
-  { id: '8', avatar: 'require("@/assets/images/Avatar2.png")', borderColor: '#FFC700' },
-  { id: '9', avatar: 'require("@/assets/images/Avatar4.png")', borderColor: '#FF79C2' },
-];
+interface Player {
+  id: string;
+  avatar: string;
+  size: number;
+  position: {
+    x: number;
+    y: number;
+  };
+}
 
-const WaitingRoom = () => {
-  const router = useRouter();
+const FloatingAvatar: React.FC<{ player: Player }> = ({ player }) => {
+  const translateX = new Animated.Value(0);
+  const translateY = new Animated.Value(0);
+
+  useEffect(() => {
+    const animateFloat = () => {
+      const randomDuration = 2000 + Math.random() * 2000;
+      const randomOffset = (Math.random() - 0.5) * 20;
+
+      Animated.sequence([
+        Animated.timing(translateY, {
+          toValue: randomOffset,
+          duration: randomDuration,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: randomDuration,
+          useNativeDriver: true,
+        }),
+      ]).start(() => animateFloat());
+    };
+
+    animateFloat();
+  }, []);
+
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.backArrow}>{'←'}</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>SCRABBLE</Text>
-      </View>
-
-      {/* Game Image */}
+    <Animated.View
+      style={[
+        styles.avatarContainer,
+        {
+          width: player.size,
+          height: player.size,
+          transform: [
+            { translateX },
+            { translateY },
+            { scale: player.size / 50 }, // Base size of 50
+          ],
+          left: player.position.x,
+          top: player.position.y,
+        },
+      ]}
+    >
       <Image
-        source={{ uri: 'https://example.com/game-image.png' }} // Replace with the actual game image URL
-        style={styles.gameImage}
+        source={{ uri: player.avatar }}
+        style={[styles.avatar, { borderRadius: player.size / 2 }]}
       />
+    </Animated.View>
+  );
+};
 
-      {/* Players */}
-      <View style={styles.playersContainer}>
-        {players.map((player, index) => (
+const CountdownTimer: React.FC<{ seconds: number }> = ({ seconds }) => {
+  const dots = 12;
+  const anglePerDot = (2 * Math.PI) / dots;
+
+  return (
+    <View style={styles.timerContainer}>
+      {Array.from({ length: dots }).map((_, index) => {
+        const angle = index * anglePerDot - Math.PI / 2;
+        const isActive = index < (seconds / 60) * dots;
+        
+        return (
           <View
-            key={player.id}
+            key={index}
             style={[
-              styles.playerCircle,
-              { borderColor: player.borderColor },
-              styles[`playerPosition${index}`], // Custom position styling for scattered layout
+              styles.timerDot,
+              {
+                transform: [
+                  {
+                    rotate: `${angle}rad`,
+                  },
+                  {
+                    translateY: -30,
+                  },
+                ],
+              },
+              isActive && styles.timerDotActive,
             ]}
-          >
-            <Image
-              source={{ uri: player.avatar }}
-              style={styles.playerAvatar}
-            />
-          </View>
-        ))}
-      </View>
-
-      {/* Countdown */}
-      <View style={styles.countdownContainer}>
-        <View style={styles.loader}>
-          {/* Placeholder for loading dots */}
-        </View>
-        <Text style={styles.countdownText}>47</Text>
-      </View>
+          />
+        );
+      })}
+      <Text style={styles.timerText}>{seconds}</Text>
     </View>
   );
 };
 
+const ScrabbleLobbyScreen: React.FC = () => {
+  const router = useRouter();
+  const [countdown, setCountdown] = useState(47);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown(prev => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const players: Player[] = [
+    { id: '1', avatar: 'url1', size: 50, position: { x: 50, y: 300 } },
+    { id: '2', avatar: 'url2', size: 40, position: { x: 120, y: 320 } },
+    // Add more players with different positions and sizes
+  ];
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>←</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerText}>
+            <Text style={styles.greenText}>SCR</Text>
+            <Text style={styles.redText}>A</Text>
+            <Text style={styles.blueText}>BB</Text>
+            <Text style={styles.yellowText}>L</Text>
+            <Text style={styles.greenText}>E</Text>
+          </Text>
+        </View>
+
+        {/* Game Board Image */}
+        <Image
+          source={require('@/assets/images/scrabble.png')} // You'll need to add this asset
+          style={styles.gameBoard}
+          resizeMode="contain"
+        />
+
+        {/* Floating Avatars */}
+        {players.map(player => (
+          <FloatingAvatar key={player.id} player={player} />
+        ))}
+
+        {/* Countdown Timer */}
+        <CountdownTimer seconds={countdown} />
+      </View>
+    </SafeAreaView>
+  );
+};
+
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#1a1424',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#0A001A',
-    paddingHorizontal: 20,
-    paddingTop: 30,
+    padding: 20,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 20,
     marginBottom: 20,
   },
-  backArrow: {
-    color: '#FFFFFF',
-    fontSize: 20,
-    marginRight: 10,
+  backButton: {
+    padding: 10,
   },
-  title: {
+  backButtonText: {
+    color: '#fff',
+    fontSize: 24,
+  },
+  headerText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#00FFD1',
+    marginLeft: 10,
   },
-  gameImage: {
+  greenText: { color: '#4CAF50' },
+  redText: { color: '#FF5252' },
+  blueText: { color: '#2196F3' },
+  yellowText: { color: '#FFC107' },
+  gameBoard: {
     width: '100%',
     height: 200,
-    borderRadius: 15,
+    borderRadius: 12,
     marginBottom: 20,
   },
-  playersContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    position: 'relative',
-  },
-  playerCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 3,
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: 10,
+  avatarContainer: {
     position: 'absolute',
+    borderWidth: 2,
+    borderColor: '#00f2ff',
   },
-  playerAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+  avatar: {
+    width: '100%',
+    height: '100%',
   },
-  countdownContainer: {
+  timerContainer: {
+    position: 'absolute',
+    bottom: 50,
+    alignSelf: 'center',
+    width: 80,
+    height: 80,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
   },
-  loader: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#FF79C2',
-    marginBottom: 10,
+  timerDot: {
+    position: 'absolute',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255, 0, 255, 0.3)',
   },
-  countdownText: {
-    color: '#FFFFFF',
+  timerDotActive: {
+    backgroundColor: '#ff00ff',
+  },
+  timerText: {
+    color: '#ff00ff',
     fontSize: 24,
     fontWeight: 'bold',
   },
-  /* Custom positions for player avatars */
-  playerPosition0: { top: 50, left: 100 },
-  playerPosition1: { top: 20, left: 150 },
-  playerPosition2: { top: 80, right: 100 },
-  playerPosition3: { top: 120, left: 50 },
-  playerPosition4: { top: 160, right: 20 },
-  playerPosition5: { bottom: 100, left: 80 },
-  playerPosition6: { bottom: 140, right: 50 },
-  playerPosition7: { bottom: 80, left: 10 },
-  playerPosition8: { bottom: 50, right: 150 },
 });
 
-export default WaitingRoom;
+export default ScrabbleLobbyScreen;

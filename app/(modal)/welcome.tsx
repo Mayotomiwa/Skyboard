@@ -16,7 +16,7 @@ const Welcome: React.FC<SuccessScreenProps> = ({ onGotoDashboard }) => {
   const router = useRouter();
   function handleNavigateToDashboard() {
     router.navigate("/(tabs)");
-    onGotoDashboard();
+    // onGotoDashboard();
   }
   return (
     <SafeAreaView style={styles.container}>
@@ -56,7 +56,7 @@ const Welcome: React.FC<SuccessScreenProps> = ({ onGotoDashboard }) => {
           style={styles.button}
           onPress={handleNavigateToDashboard}
         >
-          <Text style={styles.buttonText}>GO TO LOGIN</Text>
+          <Text style={styles.buttonText}>GO TO DASHBOARD</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

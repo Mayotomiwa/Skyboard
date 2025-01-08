@@ -1,7 +1,7 @@
 import CelebrityInviteHeader from "@/components/CelebrityHeaderComponents/CelebrityInviteHeader";
 import CelebrityPageHeader from "@/components/CelebrityHeaderComponents/CelebrityPageHeader";
 import { Stack, useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export const unstable_settings = {
   initialRouteName: "index",
@@ -21,6 +21,86 @@ const Layout = () => {
       <Stack.Screen name="selected-user" options={{ headerShown: false }} />
       <Stack.Screen name="all-games" options={{ headerShown: false }} />
       <Stack.Screen name="waitingRoom" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="host-games"
+        options={{
+          headerLeft: () => (
+            <View style={styles.header}>
+              <TouchableOpacity
+                onPress={() => router.back()}
+                style={styles.backButton}
+              >
+                <Text style={styles.backButtonText}>←</Text>
+              </TouchableOpacity>
+            </View>
+          ),
+          headerTitle: () => (
+            <Text style={styles.headerText}>
+              Host <Text style={styles.greenText}>Game</Text>
+            </Text>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="prize-amount"
+        options={{
+          headerLeft: () => (
+            <View style={styles.header}>
+              <TouchableOpacity
+                onPress={() => router.back()}
+                style={styles.backButton}
+              >
+                <Text style={styles.backButtonText}>←</Text>
+              </TouchableOpacity>
+            </View>
+          ),
+          headerTitle: () => (
+            <Text style={styles.headerText}>
+              Host <Text style={styles.greenText}>Game</Text>
+            </Text>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="gate-fee-amount"
+        options={{
+          headerLeft: () => (
+            <View style={styles.header}>
+              <TouchableOpacity
+                onPress={() => router.back()}
+                style={styles.backButton}
+              >
+                <Text style={styles.backButtonText}>←</Text>
+              </TouchableOpacity>
+            </View>
+          ),
+          headerTitle: () => (
+            <Text style={styles.headerText}>
+              Host <Text style={styles.greenText}>Game</Text>
+            </Text>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="qr-code"
+        options={{
+          headerLeft: () => (
+            <View style={styles.header}>
+              <TouchableOpacity
+                onPress={() => router.back()}
+                style={styles.backButton}
+              >
+                <Text style={styles.backButtonText}>←</Text>
+              </TouchableOpacity>
+            </View>
+          ),
+          headerTitle: () => (
+            <Text style={styles.headerText}>
+              Generate PIN <Text style={styles.greenText}>& QR Code</Text>
+            </Text>
+          ),
+        }}
+      />
       <Stack.Screen
         name="join-game"
         options={{
@@ -75,6 +155,24 @@ const Layout = () => {
           ),
         }}
       />
+      <Stack.Screen
+        name="leader-board"
+        options={{
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={styles.backButton}
+            >
+              <Text style={styles.backText}>←</Text>
+            </TouchableOpacity>
+          ),
+          headerTitle: () => (
+            <Text style={styles.title}>
+              Leader Board
+            </Text>
+          ),
+        }}
+      />
 
       <Stack.Screen
         name="editProfile"
@@ -117,6 +215,10 @@ const Layout = () => {
         name="inviteFriends"
         options={{ header: () => <CelebrityInviteHeader /> }}
       />
+      <Stack.Screen
+        name="reg-inviteFriends"
+        options={{ header: () => <CelebrityInviteHeader /> }}
+      />
 
       {/* Users */}
       <Stack.Screen name="allUsers" options={{ header: () => null }} />
@@ -126,6 +228,57 @@ const Layout = () => {
         options={{ header: () => <CelebrityPageHeader title={"Profile"} /> }}
       />
       <Stack.Screen name="chat" options={{ header: () => null }} />
+              <Stack.Screen
+                name="c-deposit"
+                options={{
+                  headerStyle: {
+                    backgroundColor: "#1a1424",
+                  },
+                  headerLeft: () => (
+                    <TouchableOpacity
+                      onPress={() => router.back()}
+                      style={styles.backButton}
+                    >
+                      <Text style={styles.backText}>←</Text>
+                    </TouchableOpacity>
+                  ),
+                  headerTitle: () => <Text style={styles.title}>Deposit</Text>,
+                }}
+              />
+              <Stack.Screen
+                name="c-withdraw"
+                options={{
+                  headerStyle: {
+                    backgroundColor: "#1a1424",
+                  },
+                  headerLeft: () => (
+                    <TouchableOpacity
+                      onPress={() => router.back()}
+                      style={styles.backButton}
+                    >
+                      <Text style={styles.backText}>←</Text>
+                    </TouchableOpacity>
+                  ),
+                  headerTitle: () => <Text style={styles.title}>Withdraw</Text>,
+                }}
+              />
+              <Stack.Screen
+                name="c-fund-history"
+                options={{
+                  headerStyle: {
+                    backgroundColor: "#1a1424",
+                  },
+                  headerLeft: () => (
+                    <TouchableOpacity
+                      onPress={() => router.back()}
+                      style={styles.backButton}
+                    >
+                      <Text style={styles.backText}>←</Text>
+                    </TouchableOpacity>
+                  ),
+                  headerTitle: () => <Text style={styles.title}>Funds History</Text>,
+                }}
+              />
     </Stack>
   );
 };
@@ -150,5 +303,22 @@ const styles = StyleSheet.create({
   },
   highlight: {
     color: "#00FF00", // Green for "Game"
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 30,
+  },
+  backButtonText: {
+    color: "#fff",
+    fontSize: 24,
+  },
+  headerText: {
+    color: "#fff",
+    fontSize: 18,
+    marginLeft: 10,
+  },
+  greenText: {
+    color: "#4CAF50",
   },
 });

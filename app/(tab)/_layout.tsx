@@ -1,9 +1,14 @@
 import CelebrityHomeHeader from "@/components/CelebrityHeaderComponents/CelebrityHomeHeader";
 import CelebrityProfileHeader from "@/components/CelebrityHeaderComponents/CelebrityProfileHeader";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs, Stack } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import React from "react";
-import { Platform, StyleSheet } from "react-native";
+import {
+  Image,
+  Platform,
+  StyleSheet,
+  Text
+} from "react-native";
 
 // Function for rendering tab icons
 function TabBarIcon(props: {
@@ -14,6 +19,7 @@ function TabBarIcon(props: {
 }
 
 export default function TabLayout() {
+  const router = useRouter();
   return (
     <Tabs
       screenOptions={{
@@ -26,29 +32,48 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
+          title: "Home",
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
           header: () => <CelebrityHomeHeader />,
         }}
       />
       <Tabs.Screen
-        name="c-analytics"
+        name="top-games"
         options={{
+          title: "Top Games",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name="pie-chart" color={color} />
+            <Image
+              source={require("@/assets/images/topgames.png")}
+              style={styles.imageIcon}
+              resizeMode="contain"
+            />
           ),
         }}
       />
       <Tabs.Screen
-        name="c-stats"
+        name="tournaments"
         options={{
+          title: "Tournaments",
+          headerStyle: {
+            backgroundColor: "#130828",
+          },
+          headerTitle: () => (
+            <Text style={styles.headerText}>Tournaments </Text>
+          ),
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name="bar-chart" color={color} />
+            <Image
+              source={require("@/assets/images/tournaments.png")}
+              style={styles.imageIcon}
+              resizeMode="contain"
+            />
           ),
         }}
       />
       <Tabs.Screen
         name="c-profile"
         options={{
+          title: "Profile",
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
           header: () => <CelebrityProfileHeader />,
         }}
@@ -78,5 +103,30 @@ const styles = StyleSheet.create({
   },
   tabBarItem: {
     marginTop: Platform.OS === "ios" ? 5 : 0, // Adjust icon alignment for iOS and Android
+  },
+  imageIcon: {
+    width: 28, // Adjust the size to match other icons
+    height: 28,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 30,
+  },
+  backButtonText: {
+    color: "#fff",
+    fontSize: 24,
+  },
+  headerText: {
+    color: "#fff",
+    fontSize: 18,
+  },
+  greenText: {
+    color: "#4CAF50",
+  },
+  backButton: {
+    alignSelf: "flex-start",
+    marginLeft: 10,
+    marginTop: 35,
   },
 });

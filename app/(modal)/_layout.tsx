@@ -13,8 +13,11 @@ const Layout = () => {
       }}
     >
       <Stack.Screen name="welcome" />
+      <Stack.Screen name="c-welcome" />
       <Stack.Screen name="welcome-modal" />
+      <Stack.Screen name="c-welcome-modal" />
       <Stack.Screen name="success-modal" />
+      <Stack.Screen name="c-success" />
     </Stack>
   );
 };

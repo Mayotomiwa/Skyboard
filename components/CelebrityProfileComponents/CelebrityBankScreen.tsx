@@ -1,20 +1,20 @@
+import { Picker } from "@react-native-picker/picker";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  Image,
+  KeyboardAvoidingView,
+  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Platform,
-  KeyboardAvoidingView,
-  Image,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import icon from "@/assets/images/bankicon.png";
-import { router } from "expo-router";
 
 const CelebrityBankScreen: React.FC = () => {
+  const icon = require('@/assets/images/bankicon.png');
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -22,6 +22,7 @@ const CelebrityBankScreen: React.FC = () => {
     bankName: "",
     accountNumber: "",
   });
+
 
   const handleInputChange = (key: keyof typeof formData, value: string) => {
     setFormData((prev) => ({
@@ -36,7 +37,7 @@ const CelebrityBankScreen: React.FC = () => {
   };
 
   const handleFinalSubmit = () => {
-    router.push("/(modal)/success-modal");
+    router.push("/(modal)/c-success");
   };
 
   return (

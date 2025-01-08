@@ -20,7 +20,7 @@ const ProfileHeader = () => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Profile</Text>
         <TouchableOpacity
-          onPress={() => router.push("/editProfile")}
+          onPress={() => router.push("/(pages)/reg-editProfile")}
           style={styles.editButton}
         >
           <Text style={styles.editIcon}>

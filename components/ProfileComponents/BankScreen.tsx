@@ -1,20 +1,23 @@
-import React, { useState } from "react";
+import { useTransactionStore } from "@/zustand/transactionStore";
+import { Picker } from "@react-native-picker/picker";
+import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Platform,
-  KeyboardAvoidingView,
-  Image,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import icon from "@/assets/images/bankicon.png";
-import { router } from "expo-router";
 
 const BankScreen: React.FC = () => {
+  const icon = require("@/assets/images/bankicon.png");
+  const { banks, isLoading, error, getBanks } = useTransactionStore();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -22,6 +25,10 @@ const BankScreen: React.FC = () => {
     bankName: "",
     accountNumber: "",
   });
+
+  useEffect(() => {
+    getBanks();
+  }, []);
 
   const handleInputChange = (key: keyof typeof formData, value: string) => {
     setFormData((prev) => ({
@@ -31,13 +38,31 @@ const BankScreen: React.FC = () => {
   };
 
   const handleSendMessage = () => {
-    // Add logic for handling form submission here
     console.log("Form Data Submitted:", formData);
   };
 
   const handleFinalSubmit = () => {
     router.push("/(modal)/success-modal");
   };
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <ActivityIndicator size="large" color="#fbbc04" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <Text style={styles.errorText}>{error}</Text>
+        <TouchableOpacity style={styles.retryButton} onPress={getBanks}>
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -54,10 +79,14 @@ const BankScreen: React.FC = () => {
             onValueChange={(value) => handleInputChange("bankName", value)}
             style={styles.picker}
           >
-            <Picker.Item label="Enter Bank" value="" />
-            <Picker.Item label="Bank A" value="Bank A" />
-            <Picker.Item label="Bank B" value="Bank B" />
-            <Picker.Item label="Bank C" value="Bank C" />
+            <Picker.Item label="Select Bank" value="" />
+            {banks.map((bank) => (
+              <Picker.Item
+                key={bank.code}
+                label={bank.name}
+                value={bank.code}
+              />
+            ))}
           </Picker>
         </View>
 
@@ -68,10 +97,18 @@ const BankScreen: React.FC = () => {
           value={formData.accountNumber}
           onChangeText={(text) => handleInputChange("accountNumber", text)}
           keyboardType="numeric"
+          maxLength={10}
         />
         <Text style={styles.label}>Nwabueze Ferdinand</Text>
 
-        <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
+        <TouchableOpacity 
+          style={[
+            styles.sendButton,
+            (!formData.bankName || !formData.accountNumber) && styles.disabledButton
+          ]} 
+          onPress={handleSendMessage}
+          disabled={!formData.bankName || !formData.accountNumber}
+        >
           <Text style={styles.sendButtonText}>Verify</Text>
         </TouchableOpacity>
 
@@ -86,8 +123,6 @@ const BankScreen: React.FC = () => {
   );
 };
 
-export default BankScreen;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -95,7 +130,10 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 80,
   },
-
+  centerContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   iconContainer: {
     alignItems: "center",
     marginBottom: 40,
@@ -132,7 +170,7 @@ const styles = StyleSheet.create({
   },
   textArea: {
     height: 120,
-    textAlignVertical: "top", // Ensures text starts at the top
+    textAlignVertical: "top",
   },
   sendButton: {
     height: 56,
@@ -141,6 +179,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 16,
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   continueButton: {
     height: 56,
@@ -155,4 +196,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "800",
   },
+  errorText: {
+    color: "#ff4444",
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  retryButton: {
+    padding: 12,
+    backgroundColor: "#fbbc04",
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "600",
+  },
 });
+
+export default BankScreen;

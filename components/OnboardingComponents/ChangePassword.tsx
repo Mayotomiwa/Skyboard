@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/zustand/authStore";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -9,36 +10,68 @@ import {
   View,
 } from "react-native";
 
-interface PasswordScreenProps {
-  onContinue: (password: string) => void;
+interface FormData {
+  email: string;
+  token: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
-const ChangePassword: React.FC<PasswordScreenProps> = ({ onContinue }) => {
+const ChangePassword: React.FC = () => {
   const router = useRouter();
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const resetPassword = useAuthStore((state) => state.resetPassword);
+  const errorMessage = useAuthStore((state) => state.errorMessage);
+  
+  const [formData, setFormData] = useState<FormData>({
+    email: "",
+    token: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  
+  const [showPasswords, setShowPasswords] = useState({
+    newPassword: false,
+    confirmPassword: false,
+  });
   const [rememberMe, setRememberMe] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState(""); // State for error message
+  const [localError, setLocalError] = useState("");
 
-  const handleContinue = () => {
-    if (!password || !confirmPassword) {
-      setError("Both fields are required.");
-    } else if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-    } else {
-      setError("");
-      onContinue(password);
-      router.push('/(modal)/welcome-modal')
+  const handleInputChange = (name: keyof FormData, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setLocalError(""); // Clear error on input change
+  };
+
+  const handleContinue = async () => {
+    const { email, token, newPassword, confirmPassword } = formData;
+
+    if (!email || !token || !newPassword || !confirmPassword) {
+      setLocalError("All fields are required.");
+      return;
     }
-    router
+
+    if (newPassword !== confirmPassword) {
+      setLocalError("Passwords do not match.");
+      return;
+    }
+
+    try {
+      await resetPassword({
+        email,
+        token,
+        newPassword,
+      });
+      router.push('/(onboarding)/sign-in');
+    } catch (error) {
+      setLocalError(error instanceof Error ? error.message : "An error occurred");
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        {/* Header */}
         <Text style={styles.title}>
           <Text style={styles.createNew}>Create new </Text>
           <Text style={styles.password}>Password</Text>
@@ -50,51 +83,81 @@ const ChangePassword: React.FC<PasswordScreenProps> = ({ onContinue }) => {
           do forgot password again
         </Text>
 
-        {/* Password Input Fields */}
+        {/* Email Input */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your email"
+            value={formData.email}
+            onChangeText={(text) => handleInputChange("email", text)}
+            placeholderTextColor="#666"
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+        </View>
+
+        {/* Token Input */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter verification token"
+            value={formData.token}
+            onChangeText={(text) => handleInputChange("token", text)}
+            placeholderTextColor="#666"
+            keyboardType="numeric"
+          />
+        </View>
+
+        {/* New Password Input */}
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
             placeholder="Create a new password"
-            secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={(text) => {
-              setPassword(text);
-              setError(""); // Clear error on input change
-            }}
+            secureTextEntry={!showPasswords.newPassword}
+            value={formData.newPassword}
+            onChangeText={(text) => handleInputChange("newPassword", text)}
             placeholderTextColor="#666"
           />
           <TouchableOpacity
-            onPress={() => setShowPassword(!showPassword)}
+            onPress={() => setShowPasswords(prev => ({
+              ...prev,
+              newPassword: !prev.newPassword
+            }))}
             style={styles.eyeButton}
           >
-            <Text style={styles.eyeText}>{showPassword ? "👁️" : "🙈"}</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm new password"
-            secureTextEntry={!showConfirmPassword}
-            value={confirmPassword}
-            onChangeText={(text) => {
-              setConfirmPassword(text);
-              setError(""); // Clear error on input change
-            }}
-            placeholderTextColor="#666"
-          />
-          <TouchableOpacity
-            style={styles.eyeIcon}
-            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-          >
             <Text style={styles.eyeText}>
-              {showConfirmPassword ? "👁️" : "🙈"}
+              {showPasswords.newPassword ? "👁️" : "🙈"}
             </Text>
           </TouchableOpacity>
         </View>
 
-        {/* Error Message */}
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        {/* Confirm Password Input */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm new password"
+            secureTextEntry={!showPasswords.confirmPassword}
+            value={formData.confirmPassword}
+            onChangeText={(text) => handleInputChange("confirmPassword", text)}
+            placeholderTextColor="#666"
+          />
+          <TouchableOpacity
+            style={styles.eyeButton}
+            onPress={() => setShowPasswords(prev => ({
+              ...prev,
+              confirmPassword: !prev.confirmPassword
+            }))}
+          >
+            <Text style={styles.eyeText}>
+              {showPasswords.confirmPassword ? "👁️" : "🙈"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Error Messages */}
+        {(localError || errorMessage) && (
+          <Text style={styles.errorText}>{localError || errorMessage}</Text>
+        )}
 
         {/* Remember Me Checkbox */}
         <TouchableOpacity

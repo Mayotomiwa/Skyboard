@@ -1,8 +1,10 @@
+import { useRouter } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 // create a component
 const CelebrityHomeHeader = () => {
+  const router = useRouter()
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -19,10 +21,10 @@ const CelebrityHomeHeader = () => {
           </View>
         </View>
         <View style={styles.headerIcons}>
-          <TouchableOpacity style={styles.iconButton}>
+          <TouchableOpacity onPress={() => router.push('/(page)/notification')} style={styles.iconButton}>
             <Text>🔔</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
+          <TouchableOpacity onPress={() => router.push('/(page)/c-fund-history')} style={styles.iconButton}>
             <Text>💰</Text>
           </TouchableOpacity>
         </View>

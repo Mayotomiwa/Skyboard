@@ -1,22 +1,29 @@
+import { Contact } from "@/types/profileTypes";
+import { useProfileStore } from "@/zustand/profileStore";
+import { Ionicons } from "@expo/vector-icons"; // Ensure you have installed @expo/vector-icons
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Platform,
-  KeyboardAvoidingView,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // Ensure you have installed @expo/vector-icons
 
 const ContactScreen: React.FC = () => {
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     fullName: "",
     email: "",
     message: "",
-  });
+  }
+  const [formData, setFormData] = useState<Contact>(initialFormData);
+
+  const { isLoading, successMessage, error: errorMessage, contactUs } = useProfileStore();
 
   const handleInputChange = (key: keyof typeof formData, value: string) => {
     setFormData((prev) => ({
@@ -25,9 +32,16 @@ const ContactScreen: React.FC = () => {
     }));
   };
 
-  const handleSendMessage = () => {
-    // Add logic for handling form submission here
-    console.log("Form Data Submitted:", formData);
+  const handleSendMessage = async () => {
+    try {
+      await contactUs(formData);
+      if (successMessage) {
+        Alert.alert("Success", successMessage);
+        setFormData(initialFormData); // Reset form after successful submission
+      }
+    } catch (error: any) {
+      Alert.alert("Error", errorMessage || "Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -65,8 +79,16 @@ const ContactScreen: React.FC = () => {
           multiline
         />
 
-        <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
-          <Text style={styles.sendButtonText}>SEND MESSAGE</Text>
+        <TouchableOpacity
+          style={styles.sendButton}
+          onPress={handleSendMessage}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator size="small" color="#130828" />
+          ) : (
+            <Text style={styles.sendButtonText}>SEND MESSAGE</Text>
+          )}
         </TouchableOpacity>
       </KeyboardAvoidingView>
     </SafeAreaView>

@@ -1,9 +1,10 @@
+import "@/assets/images/topgames.png";
 import HomeHeader from "@/components/HeaderComponents/HomeHeader";
 import ProfileHeader from "@/components/HeaderComponents/ProfileHeader";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs, Stack } from "expo-router";
+import { Tabs } from "expo-router";
 import React from "react";
-import { Platform, StyleSheet } from "react-native";
+import { Image, Platform, StyleSheet, Text } from "react-native";
 
 // Function for rendering tab icons
 function TabBarIcon(props: {
@@ -31,18 +32,34 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="analytics"
+        name="top-games"
         options={{
+          headerShown: false,
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name="pie-chart" color={color} />
+            <Image
+              source={require("@/assets/images/topgames.png")}
+              style={[styles.imageIcon]}
+              resizeMode="contain"
+            />
           ),
         }}
       />
       <Tabs.Screen
-        name="stats"
+        name="tournaments"
         options={{
+          title: "Tournaments",
+          headerStyle: {
+            backgroundColor: "#130828",
+          },
+          headerTitle: () => (
+            <Text style={styles.headerText}>Tournaments </Text>
+          ),
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name="bar-chart" color={color} />
+            <Image
+              source={require("@/assets/images/tournaments.png")}
+              style={styles.imageIcon}
+              resizeMode="contain"
+            />
           ),
         }}
       />
@@ -78,5 +95,13 @@ const styles = StyleSheet.create({
   },
   tabBarItem: {
     marginTop: Platform.OS === "ios" ? 5 : 0, // Adjust icon alignment for iOS and Android
+  },
+  imageIcon: {
+    width: 28, // Adjust the size to match other icons
+    height: 28,
+  },
+  headerText: {
+    color: "#fff",
+    fontSize: 18,
   },
 });

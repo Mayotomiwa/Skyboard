@@ -1,6 +1,10 @@
-import UserSelection from "@/components/OnboardingComponents/UserSelection";
-import React from "react";
+import UserSelection from '@/components/OnboardingComponents/UserSelection';
+import ErrorBoundary from 'react-native-error-boundary';
 
-export default function User() {
-  return <UserSelection />;
+export default function WrappedUserSelection() {
+  return (
+    <ErrorBoundary onError={(error) => console.log(error)}>
+      <UserSelection />
+    </ErrorBoundary>
+  );
 }

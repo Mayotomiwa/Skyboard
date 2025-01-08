@@ -1,6 +1,7 @@
 import InviteHeader from "@/components/HeaderComponents/InviteHeader";
 import PageHeader from "@/components/HeaderComponents/PageHeader";
 import { router, Stack } from "expo-router";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import "react-native-reanimated";
 export { ErrorBoundary } from "expo-router";
 
@@ -36,14 +37,13 @@ export default function PageLayout() {
         name="contact"
         options={{ header: () => <PageHeader title={"Contact Us"} /> }}
       />
-      <Stack.Screen name="bank" options={{ headerShown: false }} />
+      <Stack.Screen name="reg-bank" options={{ headerShown: false }} />
       <Stack.Screen
         name="inviteFriends"
         options={{ header: () => <InviteHeader /> }}
       />
-
       <Stack.Screen
-        name="editProfile"
+        name="reg-editProfile"
         options={{ header: () => <PageHeader title={"Edit Profile"} /> }}
       />
 
@@ -67,6 +67,92 @@ export default function PageLayout() {
         name="fundHistory"
         options={{ header: () => <PageHeader title={"Fund History"} /> }}
       />
+      <Stack.Screen
+        name="reg-leader-board"
+        options={{
+          headerStyle: {
+            backgroundColor: "#1a1424",
+          },
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={styles.backButton}
+            >
+              <Text style={styles.backText}>←</Text>
+            </TouchableOpacity>
+          ),
+          headerTitle: () => <Text style={styles.title}>Leader Board</Text>,
+        }}
+      />
+      <Stack.Screen
+        name="reg-deposit"
+        options={{
+          headerStyle: {
+            backgroundColor: "#1a1424",
+          },
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={styles.backButton}
+            >
+              <Text style={styles.backText}>←</Text>
+            </TouchableOpacity>
+          ),
+          headerTitle: () => <Text style={styles.title}>Deposit</Text>,
+        }}
+      />
+      <Stack.Screen
+        name="reg-wallet"
+        options={{
+          headerStyle: {
+            backgroundColor: "#1a1424",
+          },
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={styles.backButton}
+            >
+              <Text style={styles.backText}>←</Text>
+            </TouchableOpacity>
+          ),
+          headerTitle: () => <Text style={styles.title}>Withdraw</Text>,
+        }}
+      />
+      <Stack.Screen
+        name="reg-fund-history"
+        options={{
+          headerStyle: {
+            backgroundColor: "#1a1424",
+          },
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={styles.backButton}
+            >
+              <Text style={styles.backText}>←</Text>
+            </TouchableOpacity>
+          ),
+          headerTitle: () => <Text style={styles.title}>Funds History</Text>,
+        }}
+      />
     </Stack>
   );
 }
+
+const styles = StyleSheet.create({
+  backButton: {
+    alignSelf: "flex-start",
+    marginLeft: 10,
+    marginBottom: 20,
+  },
+  backText: {
+    fontSize: 24,
+    color: "#FFFFFF",
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    marginBottom: 50,
+  },
+});

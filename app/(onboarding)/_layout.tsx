@@ -14,6 +14,10 @@ const Layout = () => {
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="sign-up" options={{ headerShown: false }} />
       <Stack.Screen name="c-sign-up" options={{ headerShown: false }} />
+      <Stack.Screen name="c-sign-in" options={{ headerShown: false }} />
+      <Stack.Screen name="c-forgot" options={{ headerShown: false }} />
+      <Stack.Screen name="c-change" options={{ headerShown: false }} />
+      <Stack.Screen name="c-verification" options={{ headerShown: false }} />
       <Stack.Screen name="sign-in" options={{ headerShown: false }} />
       <Stack.Screen name="forgot-password" options={{ headerShown: false }} />
       <Stack.Screen name="verification-code" options={{ headerShown: false }} />

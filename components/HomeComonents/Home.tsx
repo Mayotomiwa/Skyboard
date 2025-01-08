@@ -1,5 +1,6 @@
+import { useProfileStore } from "@/zustand/profileStore";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Image,
   SafeAreaView,
@@ -17,7 +18,6 @@ interface Game {
   description: string;
   backgroundColor: string;
 }
-
 interface Gamer {
   id: string;
   name: string;
@@ -27,6 +27,7 @@ interface Gamer {
 
 const Home: React.FC = () => {
   const router = useRouter();
+  const { user, isLoading, error, getUserProfile } = useProfileStore();
   const games: Game[] = [
     {
       id: "1",
@@ -131,22 +132,47 @@ const Home: React.FC = () => {
     },
   ];
 
+  useEffect(() => {
+    getUserProfile();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.errorContainer}>
+        <Text style={styles.errorText}>Error: {error}</Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        {/* Header */}
 
         {/* Balance Card */}
         <View style={styles.balanceCard}>
           <View style={styles.balanceInfo}>
-            <Text style={styles.balanceLabel}>Total Amount</Text>
-            <Text style={styles.balanceAmount}>N52,000.00</Text>
+            <Text style={styles.balanceLabel}>Wallet Balance</Text>
+            <Text style={styles.balanceAmount}>
+              ₦{user?.walletBalance.toLocaleString() || "0.00"}
+            </Text>
           </View>
           <View style={styles.balanceActions}>
-            <TouchableOpacity style={[styles.actionButton, styles.fundButton]}>
+            <TouchableOpacity
+              onPress={() => router.push("/(pages)/reg-deposit")}
+              style={[styles.actionButton, styles.fundButton]}
+            >
               <Text style={styles.actionButtonText}>+ Fund your balance</Text>
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={() => router.push("/(pages)/reg-wallet")}
               style={[styles.actionButton, styles.withdrawButton]}
             >
               <Text style={styles.actionButtonText}>- Withdraw your wins</Text>
@@ -162,13 +188,13 @@ const Home: React.FC = () => {
               justifyContent: "space-between",
               alignItems: "center",
               width: "100%",
-              marginBottom: 20
+              marginBottom: 20,
             }}
           >
             <Text style={[styles.sectionTitle, { flex: 1 }]}>
               AVAILABLE GAMES
             </Text>
-            <TouchableOpacity onPress={() => router.push('/(page)/all-games')}>
+            <TouchableOpacity onPress={() => router.push("/(page)/all-games")}>
               <Text style={[styles.seeAllButton, { flexShrink: 1 }]}>
                 See all →
               </Text>
@@ -244,6 +270,28 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1A1624",
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#1A1624",
+  },
+  loadingText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#1A1624",
+  },
+  errorText: {
+    color: "#FF5C5C",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -271,18 +319,6 @@ const styles = StyleSheet.create({
   welcomeText: {
     color: "#666666",
     fontSize: 12,
-  },
-  headerIcons: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#E75B99",
-    justifyContent: "center",
-    alignItems: "center",
   },
   balanceCard: {
     margin: 16,
@@ -321,6 +357,18 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontWeight: "500",
     color: "#000000",
+  },
+  headerIcons: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  iconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#E75B99",
+    justifyContent: "center",
+    alignItems: "center",
   },
   section: {
     padding: 16,

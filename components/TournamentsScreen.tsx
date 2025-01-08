@@ -1,5 +1,6 @@
+import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface UserItemProps {
   imageUri: any;
@@ -18,6 +19,8 @@ const UserItem: React.FC<UserItemProps> = ({
   status,
   onInvite,
 }) => {
+  const router = useRouter(); // Hook for navigation
+
   // Determine the border color based on status
   let borderColor = "#b7d080"; // Default green for Join
   if (status === "Running") {
@@ -25,6 +28,18 @@ const UserItem: React.FC<UserItemProps> = ({
   } else if (status === "Ended") {
     borderColor = "red";
   }
+
+  // Handle navigation based on status
+  const handlePress = () => {
+    if (status === "Join") {
+      router.push({ pathname: "/(page)/waitingRoom", params: { game } }); // Navigate to Waiting Room
+    } else if (status === "Ended") {
+      router.push({ pathname: "/(pages)/reg-leader-board", params: { game } }); // Navigate to Leaderboard
+    } else if (status === "Running") {
+      console.log("Cannot join a running game."); // Prevent action
+    }
+  };
+  
 
   return (
     <View style={styles.userItem}>
@@ -41,7 +56,7 @@ const UserItem: React.FC<UserItemProps> = ({
       {/* Status Button */}
       <TouchableOpacity
         style={[styles.statusButton, { borderColor }, styles.statusButtonSize]}
-        onPress={onInvite}
+        onPress={handlePress}
       >
         <Text style={styles.statusButtonText}>{status}</Text>
       </TouchableOpacity>

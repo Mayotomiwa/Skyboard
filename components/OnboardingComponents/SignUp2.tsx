@@ -1,20 +1,20 @@
 import React, { useState } from "react";
 import {
-    Image,
-    SafeAreaView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Image,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 interface AccountFormData {
   username: string;
   email: string;
   password: string;
-  confirmPassword: string;
+  // confirmPassword: string;
   rememberMe: boolean;
 }
 
@@ -27,7 +27,7 @@ const SignUp2: React.FC<{
     username: initialData.username || "",
     email: initialData.email || "",
     password: initialData.password || "",
-    confirmPassword: initialData.confirmPassword || "",
+    // confirmPassword: initialData.confirmPassword || "",
     rememberMe: initialData.rememberMe || false,
   });
 
@@ -110,7 +110,7 @@ const SignUp2: React.FC<{
           </View>
 
           {/* Confirm Password Input */}
-          <View style={styles.passwordContainer}>
+          {/* <View style={styles.passwordContainer}>
             <TextInput
               style={styles.input}
               placeholder="Confirm Password"
@@ -129,7 +129,7 @@ const SignUp2: React.FC<{
                 {confirmPasswordVisible ? "👁️" : "🙈"}
               </Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
 
           <TouchableOpacity
             style={styles.rememberContainer}

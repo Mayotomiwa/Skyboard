@@ -1,13 +1,24 @@
-//import liraries
-import { useRouter } from "expo-router";
-import { ChevronLeft, Pen } from "lucide-react-native";
 import Entypo from "@expo/vector-icons/Entypo";
+import { useRouter } from "expo-router";
+import { ChevronLeft } from "lucide-react-native";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-// create a component
 const CelebrityInviteHeader = () => {
   const router = useRouter();
+
+  const handleShare = async () => {
+    try {
+      const result = await Share.share({
+        message: "Check out this amazing app!", // Customize this message
+        title: "Share App", // Optional title
+        // url: "https://your-app-url.com" // Optional URL if you want to share a link
+      });
+    } catch (error) {
+      console.error("Error sharing:", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -20,7 +31,10 @@ const CelebrityInviteHeader = () => {
           </Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Invite Friends</Text>
-        <TouchableOpacity style={styles.shareButton}>
+        <TouchableOpacity 
+          style={styles.shareButton}
+          onPress={handleShare}
+        >
           <Text style={styles.shareIcon}>
             <Entypo name="share" size={24} color="white" />
           </Text>
@@ -30,7 +44,6 @@ const CelebrityInviteHeader = () => {
   );
 };
 
-// define your styles
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#130828",
@@ -68,5 +81,4 @@ const styles = StyleSheet.create({
   },
 });
 
-//make this component available to the app
 export default CelebrityInviteHeader;
