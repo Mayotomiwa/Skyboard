@@ -39,7 +39,7 @@
       [
         "expo-contacts",
         {
-          "contactsPermission": "Allow $(PRODUCT_NAME) to access your contacts."
+          "contactsPermission": "Allow Skyboard to access your contacts."
         }
       ]
     ],
