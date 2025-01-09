@@ -1,6 +1,7 @@
 import InviteHeader from "@/components/HeaderComponents/InviteHeader";
 import PageHeader from "@/components/HeaderComponents/PageHeader";
 import { router, Stack } from "expo-router";
+import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import "react-native-reanimated";
 export { ErrorBoundary } from "expo-router";

@@ -4,6 +4,10 @@
     "slug": "Skyboard",
     "version": "1.0.0",
     "orientation": "portrait",
+    "assetBundlePatterns": [
+      "assets/fonts/*",
+      "assets/images/*"
+    ],
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
@@ -17,11 +21,10 @@
       "supportsTablet": true
     },
     "android": {
+      "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff",
-        "softwareKeyboardLayoutMode": "pan",
-        "enableDangerousExperimentalLeanBuilds": false
+        "backgroundColor": "#ffffff"
       },
       "permissions": [
         "android.permission.READ_CONTACTS",

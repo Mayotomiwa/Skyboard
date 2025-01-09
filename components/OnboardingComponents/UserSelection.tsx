@@ -31,7 +31,27 @@ const accountOptions: AccountOption[] = [
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
+const DEBUG = !__DEV__;
+
+const logDebug = (...args: any[]) => {
+  if (DEBUG) console.log(...args);
+};
+
 const UserSelection: React.FC = () => {
+  useEffect(() => {
+    logDebug('UserSelection mounted');
+    
+    // Test if animation system is working
+    const testAnim = new Animated.Value(0);
+    Animated.timing(testAnim, {
+      toValue: 1,
+      duration: 1,
+      useNativeDriver: false
+    }).start(() => logDebug('Animation system initialized'));
+
+    return () => logDebug('UserSelection unmounted');
+  }, []);
+
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
   const [selectedType, setSelectedType] = useState<string | null>(null);
@@ -79,8 +99,10 @@ const UserSelection: React.FC = () => {
 
     try {
       if (selectedType === "regular") {
+        logDebug('Component not ready');
         router.push("/(onboarding)/sign-up");
       } else {
+        logDebug('Component not ready');
         router.push("/(onboarding)/c-sign-up");
       }
     } catch (error) {
@@ -97,12 +119,10 @@ const UserSelection: React.FC = () => {
 
   // Show loading state while initializing
   if (!isReady) {
+    logDebug('Component not ready');
     return (
-      <View style={styles.container}>
-        <StatusBar barStyle="light-content" />
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading...</Text>
-        </View>
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }

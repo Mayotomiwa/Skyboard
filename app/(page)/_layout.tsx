@@ -1,6 +1,7 @@
 import CelebrityInviteHeader from "@/components/CelebrityHeaderComponents/CelebrityInviteHeader";
 import CelebrityPageHeader from "@/components/CelebrityHeaderComponents/CelebrityPageHeader";
 import { Stack, useRouter } from "expo-router";
+import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export const unstable_settings = {

@@ -2,7 +2,8 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
+import { Alert } from "react-native";
 import "react-native-reanimated";
 
 export {
@@ -40,6 +41,14 @@ export default function RootLayout() {
   }
 
   return <RootLayoutNav />;
+}
+if (!__DEV__) {
+  // Log any global errors
+  ErrorUtils.setGlobalHandler((error, isFatal) => {
+    console.log('Global Error:', error);
+    Alert.alert(error);
+    // You could also use a logging service here
+  });
 }
 
 function RootLayoutNav() {
